@@ -1,7 +1,5 @@
-//
-// Lanski's Game Library
-//     made by Dmitry Egorov
-//
+// Lanski's Utilities
+//     by Dmitry Egorov
 #pragma once
 #include <cstdint>
 

@@ -1,7 +1,5 @@
-//
 // Lanski's Utilities
-//     made by Dmitry Egorov
-//
+//     by Dmitry Egorov
 #pragma once
 #include <immintrin.h>
 #include "lu_prims.h"

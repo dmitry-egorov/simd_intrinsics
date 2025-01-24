@@ -39,6 +39,7 @@ int main(void) {
             src_arr[i] = rand();
     }
 
+    printf("Benchmarking...\n");
     for (usize size_i = 0; size_i < std::size(sizes); size_i++) {
         auto byte_size = sizes[size_i];
         auto count_u32   = byte_size / 4;
@@ -118,7 +119,7 @@ int main(void) {
 
         auto sum_result = (u32)0;
 
-        // valid sum
+        // calculate the actual sum
         {
             for (usize i = 0; i < count_u32; i++)
                 sum_result += src_arr[i];
@@ -141,17 +142,17 @@ int main(void) {
             }
 
             return (s0 + s1).hsum();
-        }, [&](u32 result) {
-            return result == sum_result;
-        });
+        }, [&](u32 result) { return result == sum_result; });
 
         if (0)
         lu_benchmark("sum simd x4", byte_size, [&] {
             mm_u32x8 s0 = {}, s1 = {}, s2 = {}, s3 = {};
 
             for (usize i = 0; i < count_u32x8; i += 4) {
-                s0 += src_x8[i + 0]; s1 += src_x8[i + 1];
-                s2 += src_x8[i + 2]; s3 += src_x8[i + 3];
+                s0 += src_x8[i + 0];
+                s1 += src_x8[i + 1];
+                s2 += src_x8[i + 2];
+                s3 += src_x8[i + 3];
             }
 
             return ((s0 + s1) + (s2 + s3)).hsum();
@@ -161,33 +162,36 @@ int main(void) {
             mm_u32x8 s0 = {}, s1 = {}, s2 = {}, s3 = {}, s4 = {}, s5 = {}, s6 = {}, s7 = {};
 
             for (usize i = 0; i < count_u32x8; i += 8) {
-                s0 += src_x8[i + 0]; s1 += src_x8[i + 1];
-                s2 += src_x8[i + 2]; s3 += src_x8[i + 3];
-                s4 += src_x8[i + 4]; s5 += src_x8[i + 5];
-                s6 += src_x8[i + 6]; s7 += src_x8[i + 7];
+                s0 += src_x8[i + 0];
+                s1 += src_x8[i + 1];
+                s2 += src_x8[i + 2];
+                s3 += src_x8[i + 3];
+                s4 += src_x8[i + 4];
+                s5 += src_x8[i + 5];
+                s6 += src_x8[i + 6];
+                s7 += src_x8[i + 7];
             }
 
             return (((s0 + s1) + (s2 + s3)) + ((s4 + s5) + (s6 + s7))).hsum();
         }, [&](u32 result) { return result == sum_result; });
 
-        if (0) {
-            lu_benchmark("simple swap", byte_size, [&] {
-                for (usize i = 0; i < count_u32; i++)
-                    dst_arr[count_u32 - i - 1] = src_arr[i];
+        if (0)
+        lu_benchmark("simple swap", byte_size, [&] {
+            for (usize i = 0; i < count_u32; i++)
+                dst_arr[count_u32 - i - 1] = src_arr[i];
 
-                return 0;
-            }, [&](u32) {
-                for (usize i = 0; i < count_u32; i++)
-                    if (dst_arr[count_u32 - i - 1] != src_arr[i])
-                        return false;
+            return 0;
+        }, [&](u32) {
+            for (usize i = 0; i < count_u32; i++)
+                if (dst_arr[count_u32 - i - 1] != src_arr[i])
+                    return false;
 
-                return true;
-            });
-        }
+            return true;
+        });
 
         auto last_item = src_arr[count_u32 - 1];
 
-        { // remove duplicates
+        { // remove duplicates of the last item
             for(usize i = 0; i < count_u32 - 1; i++)
                 if (src_arr[i] == last_item)
                     src_arr[i] = 1111;
@@ -199,9 +203,7 @@ int main(void) {
                     return i;
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simple x2", byte_size, [&] {
@@ -216,9 +218,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         lu_benchmark("find simple x4", byte_size, [&] {
             for (usize i = 0; i < count_u32; i += 4) {
@@ -234,9 +234,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simple x8", byte_size, [&] {
@@ -265,9 +263,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         lu_benchmark("find simd", byte_size, [&] {
             auto target_x8 = mm_u32x8_broadcast(last_item);
@@ -279,9 +275,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simd 2", byte_size, [&] {
@@ -294,9 +288,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simd x2", byte_size, [&] {
@@ -318,9 +310,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simd x4", byte_size, [&] {
@@ -346,9 +336,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         if (0)
         lu_benchmark("find simd x8", byte_size, [&] {
@@ -382,9 +370,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
 
         lu_benchmark("find simd x16", byte_size, [&] {
             auto target_x8 = mm_u32x8_broadcast(last_item);
@@ -437,9 +423,7 @@ int main(void) {
             }
 
             return (usize)-1;
-        }, [&](usize idx) {
-            return (idx != (usize)-1) && (src_arr[idx] == last_item);
-        });
+        }, [&](usize idx) { return (idx != (usize)-1) && (src_arr[idx] == last_item); });
     }
 
     return 0;

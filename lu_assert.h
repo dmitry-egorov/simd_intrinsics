@@ -1,3 +1,5 @@
+// Lanski's Utilities
+//     by Dmitry Egorov
 #pragma once
 
 #ifdef DEBUG
