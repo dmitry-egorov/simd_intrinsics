@@ -45,6 +45,20 @@ struct mm_u32x8 {
 
         return sum;
     }
+
+    inline auto hmin() const -> u32 {
+        auto min = (u32)-1;
+        auto sp  = (u32*)&rgx;
+        for (auto i = 0; i < 8; i++)
+            if (sp[i] < min)
+                min = sp[i];
+
+        return min;
+    }
 };
 
 static inline auto mm_u32x8_broadcast(u32 v) -> mm_u32x8 { return { _mm256_set1_epi32(v) }; }
+
+static inline auto mm_min(mm_u32x8 a, mm_u32x8 b) -> mm_u32x8 {
+    return { _mm256_min_epu32(a.rgx, b.rgx) };
+}

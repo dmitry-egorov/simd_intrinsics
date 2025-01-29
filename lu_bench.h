@@ -8,7 +8,7 @@
 static inline auto lu_benchmark(const char* name, usize bytes, auto fn, auto validate) -> void {
     lu_init_cpu_timer();
 
-    printf("%-20s: ", name);
+    printf("    %-20s: ", name);
 
     auto overall_duration = lu_cpu_timer_freq; // 1 second
 
@@ -43,6 +43,5 @@ static inline auto lu_benchmark(const char* name, usize bytes, auto fn, auto val
     auto min_throughput = ((f64)bytes / (f64)min_time_s) / 1'000'000'000.0;
     auto avg_throughput = ((f64)bytes / (f64)avg_time_s) / 1'000'000'000.0;
 
-
-    printf("min %8dus, %10f Gb/s, avg %8dus, %10f Gb/s\n", min_time_us, min_throughput, avg_time_us, avg_throughput);
+    printf("%8dus, %10f Gb/s, %8dus, %10f Gb/s\n", min_time_us, min_throughput, avg_time_us, avg_throughput);
 }
